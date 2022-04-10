@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skate Tracker.Android", "Skate Tracker\Skate Tracker.Android\Skate Tracker.Android.csproj", "{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skate Tracker", "Skate Tracker\Skate Tracker\Skate Tracker.csproj", "{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2261A734-A382-4E30-99D3-BCEEF6E82ABD}
+	EndGlobalSection
+EndGlobal
