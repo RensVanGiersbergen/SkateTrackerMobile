@@ -13,6 +13,8 @@ namespace Skate_Tracker
     {
         public MainPage()
         {
+            bool isTracking = false;
+
             Geocoder geoCoder = new Geocoder();
             Button StartStopJourney = new Button()
             {
@@ -45,6 +47,15 @@ namespace Skate_Tracker
             };
             map.MapElements.Add(route);
 
+            StartStopJourney.Clicked += StartStopTracking;
+
+            void StartStopTracking(object sender, EventArgs args)
+            {
+                if (!isTracking)
+                {
+                    isTracking = true;
+                }
+            }
             Content = new StackLayout()
             {
                 Children =
