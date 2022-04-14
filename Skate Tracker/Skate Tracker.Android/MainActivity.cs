@@ -15,7 +15,8 @@ namespace Skate_Tracker.Droid
         readonly string[] LocationPermissions =
         {
             Manifest.Permission.AccessCoarseLocation,
-            Manifest.Permission.AccessFineLocation
+            Manifest.Permission.AccessFineLocation,
+            Manifest.Permission.AccessBackgroundLocation    
         };
 
         protected override void OnStart()
