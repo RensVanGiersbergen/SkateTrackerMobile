@@ -17,6 +17,7 @@ namespace Skate_Tracker
         public MainPage()
         {
             bool isTracking = false;
+            Position MostRecentPosition = new Position(0, 0);
 
             //Prevent the screen from entering sleep mode and etc
             DeviceDisplay.KeepScreenOn = true;
@@ -78,10 +79,41 @@ namespace Skate_Tracker
                 GetCurrentLocation(); 
             }
 
-            Position oldPosition;
+            
             void UpdateMap(Position position, double speed)
             {
-                route.Geopath.Add(position);
+                Color color;
+                if(speed < 2.8f)
+                {
+                    color = Color.Green;
+                }
+                else if(speed >= 2.8f && speed < 5.54f)
+                {
+                    color = Color.Yellow;
+                }
+                else if(speed >= 5.55f && speed < 9.75f)
+                {
+                    color = Color.Orange;
+                }
+                else
+                {
+                    color = Color.Red;
+                }
+
+                if(MostRecentPosition != new Position(0,0))
+                {
+                    map.MapElements.Add(new Polyline() 
+                    { 
+                        Geopath = { MostRecentPosition, position},
+                        StrokeWidth = 15,
+                        StrokeColor = color
+                    });
+                    MostRecentPosition = position;
+                }
+                else
+                {
+                    MostRecentPosition = position;
+                }
                 map.MoveToRegion(MapSpan.FromCenterAndRadius(position, Distance.FromMeters(100)));
             }
 
