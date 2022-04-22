@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Xamarin.Essentials;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Skate_Tracker.JsonTransferObjects;
 using System.Threading;
-using System.Timers;
 
 namespace Skate_Tracker
 {
@@ -16,36 +15,73 @@ namespace Skate_Tracker
     {
         public MainPage()
         {
-            bool isTracking = false;
+            //Base variables
+            bool isPaused = false;
             Position MostRecentPosition = new Position(0, 0);
+            int currentJourneyID = 4;
+
+            //Client for posts to api
+            HttpClient client = new HttpClient();
 
             //Prevent the screen from entering sleep mode and etc
             DeviceDisplay.KeepScreenOn = true;
 
             //Create main start and stop button for tracking
-            Button StartStopJourney = new Button()
+            Button StartJourney = new Button()
             {
                 Text = "Start",
                 TextColor = Color.Snow,
-                BackgroundColor = Color.FromHex("#ff7700"),
+                BackgroundColor = Color.FromHex("#28eb35"),
                 CornerRadius = 5,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.End
             };
+
+            Button StopJourney = new Button()
+            {
+                Text = "Stop",
+                TextColor = Color.Snow,
+                BackgroundColor = Color.OrangeRed,
+                CornerRadius = 5,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.End
+            };
+
+            Button PauseUnpauseJourney = new Button()
+            {
+                Text = "Pauze",
+                TextColor = Color.Snow,
+                BackgroundColor = Color.FromHex("#ff7700"),
+                CornerRadius = 5,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.End,
+            };
+
+            //Grid for buttons
+            Grid grid = new Grid()
+            {
+                IsVisible = false,
+                RowDefinitions =
+                {
+                    new RowDefinition {Height = new GridLength(2, GridUnitType.Auto) },
+                    new RowDefinition()
+                }
+            };
+            grid.Children.Add(StopJourney, 1, 0);
+            grid.Children.Add(PauseUnpauseJourney, 0, 0);
 
             //Create map 
             Xamarin.Forms.Maps.Map map = new Xamarin.Forms.Maps.Map()
             {
                 IsShowingUser = true,
             };
-            map.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(0,0), Distance.FromKilometers(40000)));
+            map.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(0, 0), Distance.FromKilometers(40000)));
 
             //Polyline settings, creates polyline and draws it on map
             Polyline route = new Polyline()
             {
-                StrokeColor = Color.FromHex("#ff7700"),
                 StrokeWidth = 15,
-                Geopath = {}
+                Geopath = { }
             };
             map.MapElements.Add(route);
 
@@ -54,44 +90,69 @@ namespace Skate_Tracker
             timer.AutoReset = true;
             timer.Elapsed += Timer_Elapsed;
 
-            //On main button for tracking clicked
-            StartStopJourney.Clicked += StartStopTracking;
+            //Events for clicks on button
+            StartJourney.Clicked += StartTracking;
+            StopJourney.Clicked += StopTracking;
+            PauseUnpauseJourney.Clicked += PauseOrUnpause;
 
             //Start and stops all tracking functions and updates UI
-            async void StartStopTracking(object sender, EventArgs args)
+            async void StartTracking(object sender, EventArgs args)
             {
-                if (!isTracking)
+                PostJourneyAndGetID();
+                timer.Start();
+                StartJourney.IsVisible = false;
+                grid.IsVisible = true;
+
+            }
+
+            async void StopTracking(object sender, EventArgs args)
+            {
+                timer.Stop();
+                isPaused = false;
+                PauseUnpauseJourney.Text = "Pause";
+                grid.IsVisible = false;
+                StartJourney.BackgroundColor = Color.FromHex("#28eb35");
+                StartJourney.IsVisible = true;
+            }
+
+            async void PauseOrUnpause(object sender, EventArgs args)
+            {
+                if (!isPaused)
                 {
-                    isTracking = true;
-                    StartStopJourney.Text = "Stop";
-                    timer.Start();
+                    timer.Stop();
+                    PauseUnpauseJourney.Text = "Unpause";
+                    isPaused = true;
                 }
                 else
                 {
-                    isTracking = false;
-                    StartStopJourney.Text = "Start";
-                    timer.Stop();
+                    timer.Start();
+                    PauseUnpauseJourney.Text = "Pause";
+                    isPaused = false;
                 }
             }
 
-            void Timer_Elapsed(object sender, EventArgs e)
+            async void Timer_Elapsed(object sender, EventArgs e)
             {
-                GetCurrentLocation(); 
+                await GetCurrentLocation();
             }
 
-            
+
             void UpdateMap(Position position, double speed)
             {
                 Color color;
-                if(speed < 2.8f)
+                if (speed < 2.8f)
                 {
                     color = Color.Green;
                 }
-                else if(speed >= 2.8f && speed < 5.54f)
+                else if (speed >= 2.8f && speed < 5.54f)
+                {
+                    color = Color.LightGreen;
+                }
+                else if (speed >= 5.54f && speed < 8.33f)
                 {
                     color = Color.Yellow;
                 }
-                else if(speed >= 5.55f && speed < 9.75f)
+                else if (speed >= 8.33f && speed < 11.11f)
                 {
                     color = Color.Orange;
                 }
@@ -100,11 +161,11 @@ namespace Skate_Tracker
                     color = Color.Red;
                 }
 
-                if(MostRecentPosition != new Position(0,0))
+                if (MostRecentPosition != new Position(0, 0))
                 {
-                    map.MapElements.Add(new Polyline() 
-                    { 
-                        Geopath = { MostRecentPosition, position},
+                    map.MapElements.Add(new Polyline()
+                    {
+                        Geopath = { MostRecentPosition, position },
                         StrokeWidth = 15,
                         StrokeColor = color
                     });
@@ -123,10 +184,11 @@ namespace Skate_Tracker
                 try
                 {
                     var location = await Geolocation.GetLocationAsync();
-                    if (location != null)
+                    if (location.Speed != null)
                     {
                         Console.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}, Speed: {location.Speed}, Time: {DateTime.Now}");
                         Device.BeginInvokeOnMainThread(() => UpdateMap(new Position(location.Latitude, location.Longitude), (double)location.Speed));
+                        await PostPosition(location);
                     }
                 }
                 catch (FeatureNotSupportedException fnsEx)
@@ -147,19 +209,61 @@ namespace Skate_Tracker
                 }
             }
 
-            async void PostPosition()
+            async Task PostPosition(Location location)
             {
+                Uri uri = new Uri("https://i461941core.venus.fhict.nl/api/Skate/SendPosition");
 
+                if (Connectivity.NetworkAccess == NetworkAccess.Internet)
+                {
+                    string json = JsonConvert.SerializeObject(new PositionDataObject() { JourneyID = currentJourneyID, Latitude = location.Latitude, Longitude = location.Longitude, Speed = (float)location.Speed, TimeStamp = DateTime.Now });
+                    StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync(uri, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Succesfully posted location data to api");
+                    }
+                    else
+                    {
+                        Console.WriteLine(response.StatusCode.ToString(), response.Content);
+                    }
+                }
             }
+
+            async Task PostJourneyAndGetID()
+            {
+                string name = await DisplayPromptAsync("Enter journey name", "Leave empty if u don't want to name your journey");
+                Uri uri = new Uri("https://i461941core.venus.fhict.nl/api/Skate/AddJourney/");
+                Console.WriteLine(name);
+                if (Connectivity.NetworkAccess == NetworkAccess.Internet)
+                {
+                    string json = JsonConvert.SerializeObject(new JourneyDataObject() { Name = name, StartTime = DateTime.Now });
+                    StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync(uri, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        currentJourneyID = Convert.ToInt32(response.Content.ReadAsStringAsync().Result);
+                        Console.WriteLine($"Succesfully created journey ({name}) with id: {currentJourneyID}");
+                    }
+                    else
+                    {
+                        Console.WriteLine(response.StatusCode.ToString(), response.Content);
+                    }
+                }
+            }
+
             //Add content to page
             Content = new StackLayout()
             {
                 Children =
                 {
-                    map,
-                    StartStopJourney
+                map,
+                    StartJourney,
+                    grid
                 }
             };
+
         }
     }
 }

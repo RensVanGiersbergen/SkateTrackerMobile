@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skate Tracker.Android", "Skate Tracker\Skate Tracker.Android\Skate Tracker.Android.csproj", "{E9F0C65E-63EF-47CA-8D23-F9B2CEAD3803}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skate Tracker", "Skate Tracker\Skate Tracker\Skate Tracker.csproj", "{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skate Tracker", "Skate Tracker\Skate Tracker\Skate Tracker.csproj", "{C56F32E3-4342-47BB-8DA1-39C5BA503FF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
