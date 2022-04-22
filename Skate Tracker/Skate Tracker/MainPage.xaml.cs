@@ -99,10 +99,6 @@ namespace Skate_Tracker
             async void StartTracking(object sender, EventArgs args)
             {
                 await PostJourneyAndGetID();
-                timer.Start();
-                StartJourney.IsVisible = false;
-                grid.IsVisible = true;
-
             }
 
             async void StopTracking(object sender, EventArgs args)
@@ -253,6 +249,10 @@ namespace Skate_Tracker
                         {
                             currentJourneyID = Convert.ToInt32(response.Content.ReadAsStringAsync().Result);
                             Console.WriteLine($"Succesfully created journey ({name}) with id: {currentJourneyID}");
+
+                            timer.Start();
+                            StartJourney.IsVisible = false;
+                            grid.IsVisible = true;
                         }
                         else
                         {
