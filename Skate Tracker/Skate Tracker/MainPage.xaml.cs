@@ -98,7 +98,7 @@ namespace Skate_Tracker
             //Start and stops all tracking functions and updates UI
             async void StartTracking(object sender, EventArgs args)
             {
-                PostJourneyAndGetID();
+                await PostJourneyAndGetID();
                 timer.Start();
                 StartJourney.IsVisible = false;
                 grid.IsVisible = true;
@@ -131,9 +131,10 @@ namespace Skate_Tracker
                 }
             }
 
-            async void Timer_Elapsed(object sender, EventArgs e)
+            void Timer_Elapsed(object sender, EventArgs e)
             {
-                await GetCurrentLocation();
+                Console.WriteLine("Timer still running!");
+                GetCurrentLocation();
             }
 
 
@@ -190,6 +191,10 @@ namespace Skate_Tracker
                         Device.BeginInvokeOnMainThread(() => UpdateMap(new Position(location.Latitude, location.Longitude), (double)location.Speed));
                         await PostPosition(location);
                     }
+                    else
+                    {
+                        Console.WriteLine("Gps is fucked..");
+                    }
                 }
                 catch (FeatureNotSupportedException fnsEx)
                 {
@@ -235,20 +240,24 @@ namespace Skate_Tracker
                 string name = await DisplayPromptAsync("Enter journey name", "Leave empty if u don't want to name your journey");
                 Uri uri = new Uri("https://i461941core.venus.fhict.nl/api/Skate/AddJourney/");
                 Console.WriteLine(name);
-                if (Connectivity.NetworkAccess == NetworkAccess.Internet)
-                {
-                    string json = JsonConvert.SerializeObject(new JourneyDataObject() { Name = name, StartTime = DateTime.Now });
-                    StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await client.PostAsync(uri, content);
 
-                    if (response.IsSuccessStatusCode)
+                if(name != null)
+                {
+                    if (Connectivity.NetworkAccess == NetworkAccess.Internet)
                     {
-                        currentJourneyID = Convert.ToInt32(response.Content.ReadAsStringAsync().Result);
-                        Console.WriteLine($"Succesfully created journey ({name}) with id: {currentJourneyID}");
-                    }
-                    else
-                    {
-                        Console.WriteLine(response.StatusCode.ToString(), response.Content);
+                        string json = JsonConvert.SerializeObject(new JourneyDataObject() { Name = name, StartTime = DateTime.Now });
+                        StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+                        HttpResponseMessage response = await client.PostAsync(uri, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            currentJourneyID = Convert.ToInt32(response.Content.ReadAsStringAsync().Result);
+                            Console.WriteLine($"Succesfully created journey ({name}) with id: {currentJourneyID}");
+                        }
+                        else
+                        {
+                            Console.WriteLine(response.StatusCode.ToString(), response.Content);
+                        }
                     }
                 }
             }
